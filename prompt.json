@@ -1,0 +1,163 @@
+{
+    "application-id": "qu-skillbridge",
+    "application-name": "QuSkillBridge",
+    "application-description": "QuSkillBridge is a an application that helps you calculate the delta between your current skills and your aspired role. You can create courses to bridge the gap between these skills.",
+    "prompts": [
+        {
+            "id": "8",
+            "title": "AMBIGUITY_RESOLUTION_PROMPT",
+            "description": "This prompt is used for the chatbot to resolve ambiguous questions using show-and-tell method.",
+            "prompt_content": "\nGenerate the OUTPUT QUESTION based on the following examples for the last query.\n\nHISTORY:\n[]\nNOW QUESTION: Hello, how are you?\nNEED COREFERENCE RESOLUTION: No => THOUGHT: Consequently, the output question mirrors the current query.\nOUPUT QUESTION: Hello, how are you?\n-------------------\nHISTORY:\n[User: Is Milvus a vector database?\nYou: Yes, Milvus is a vector database.]\nNOW QUESTION: How to use it?\nNEED COREFERENCE RESOLUTION: Yes => THOUGHT: I must substitute 'it' with 'Milvus' in the current question.\nOUTPUT QUESTION: How to use Milvus?\n-------------------\nHISTORY:\n[]\nNOW QUESTION: What are its features?\nNEED COREFERENCE RESOLUTION: Yes => THOUGHT: Although 'it' requires substitution, there's no suitable reference in the history. Thus, the output question remains unchanged. \nOUTPUT QUESTION: What are its features?\n-------------------\nHISTORY:\n[User: What is PyTorch?\nYou: PyTorch is an open-source machine learning library for Python. It provides a flexible and efficient framework for building and training deep neural networks.\nUser: What is Tensorflow?\nYou: TensorFlow is an open-source machine learning framework. It provides a comprehensive set of tools, libraries, and resources for building and deploying machine learning models.]\nNOW QUESTION: What is the difference between them?\nNEED COREFERENCE RESOLUTION: Yes => THOUGHT: 'Them' should be replaced with 'PyTorch and Tensorflow' in the current question.\nOUTPUT QUESTION: What is the difference between PyTorch and Tensorflow?\n-------------------\nHISTORY:[\n{HISTORY}\n]\nNOW QUESTION: {QUESTION}\nNEED COREFERENCE RESOLUTION:\nOUTPUT QUESTION: ",
+            "fields": [
+                {
+                    "name": "{HISTORY}",
+                    "type": "string",
+                    "label": "History",
+                    "description": "The history of the conversation"
+                },
+                {
+                    "name": "{QUESTION}",
+                    "type": "string",
+                    "label": "Question",
+                    "description": "The question after resolving the ambiguity"
+                }
+            ],
+            "OUTPUT_FORMAT": "Resolved Question."
+        },
+        {
+            "id": "9",
+            "title": "RESPONSE_PROMPT",
+            "description": "This prompt is used to generate a response to a question based on the context provided.",
+            "prompt_content": "\nAnswer the given question using the provided context only. \nYou have to return 2 things :\n1. A conversational reponse to the question below using the context and previous conversation only. Return the answer in the form of bullet points if the answer is longer than 100 words in markdown format.\n2. A list of three related follow-up questions to the question that the user might have. Do not repeat the suggested questions. \n\n{FORMAT_INSTRUCTIONS}\n\nHistory:\n{HISTORY}\n\nContext:\n{CONTEXT}\n\n\nQuestion:\n{QUESTION}\n\nIf the answer is not present in the context, return 'QuCopilot is designed to answer questions based on the content you just reviewed. I am sorry, I can't answer your question as is. Can you provide more context to your question if you believe your question was relevant to the topic we just discussed?'",
+            "fields": [
+                {
+                    "name": "{FORMAT_INSTRUCTIONS}",
+                    "type": "string",
+                    "label": "Format Instructions",
+                    "description": "The instructions for the format of the response"
+                },
+                {
+                    "name": "{HISTORY}",
+                    "type": "string",
+                    "label": "History",
+                    "description": "The history of the conversation"
+                },
+                {
+                    "name": "{CONTEXT}",
+                    "type": "string",
+                    "label": "Context",
+                    "description": "The context of the content"
+                },
+                {
+                    "name": "{QUESTION}",
+                    "type": "string",
+                    "label": "Question",
+                    "description": "The question to be answered"
+                }
+            ],
+            "OUTPUT_FORMAT": "Response in markdown format."
+        },
+        {
+            "id": "10",
+            "title": "RETRY_PROMPT",
+            "description": "This prompt is used to regenerate the previous answer with proper JSON formatting if it is not formatted properly the first time.",
+            "prompt_content": "\nError encountered: {ERROR}\n\nRegenerate the previous answer with proper JSON format\nDO NOT FORGET TO PUT COMMA(,) between the keys in JSON output\n{FORMAT_INSTRUCTIONS}\n\n{HISTORY}\n\nYou:\n{CONTEXT}\n\nQuestion:\n{QUESTION}\n",
+            "fields": [
+                {
+                    "name": "{ERROR}",
+                    "type": "string",
+                    "label": "Error",
+                    "description": "The error encountered"
+                },
+                {
+                    "name": "{FORMAT_INSTRUCTIONS}",
+                    "type": "string",
+                    "label": "Format Instructions",
+                    "description": "The instructions for the format of the response"
+                },
+                {
+                    "name": "{HISTORY}",
+                    "type": "string",
+                    "label": "History",
+                    "description": "The history of the conversation"
+                },
+                {
+                    "name": "{CONTEXT}",
+                    "type": "string",
+                    "label": "Context",
+                    "description": "The context of the content"
+                },
+                {
+                    "name": "{QUESTION}",
+                    "type": "string",
+                    "label": "Question",
+                    "description": "The question to be answered"
+                }
+            ],
+            "OUTPUT_FORMAT": "Response in JSON format."
+        },
+        {
+            "id": "11",
+            "title": "GET_COURSE_OUTLINE_PROMPT",
+            "description": "This prompt is used to generate a course outline based on the differences in the skill between the profile and job description provided.",
+            "prompt_content": " \nYou are creating a course personalized for this person. The course outline should be tailored based on the level of experience and education for the person and should not include stuff that the person already knows. Instead, the course outline should focus on what the person does not know. \nAttached profile {PROFILE} is the profile of a person who is applying for a {POSITION} role. The job requirements is below. \nThe course should have modules and each module should have submodules. \nEach submodule should map the learning outcomes. \n Give me all the modules and submodules compulsorily. \nJob Description: \n{DESCRIPTION}.",
+            "fields": [
+                {
+                    "name": "{PROFILE}",
+                    "type": "string",
+                    "label": "Profile",
+                    "description": "The profile of the person applying for the role"
+                },
+                {
+                    "name": "{POSITION}",
+                    "type": "string",
+                    "label": "Position",
+                    "description": "The position for which the person is applying"
+                },
+                {
+                    "name": "{DESCRIPTION}",
+                    "type": "string",
+                    "label": "Job Description",
+                    "description": "The job description for the position"
+                }
+            ],
+            "OUTPUT_FORMAT": "# Module: xyz ## Submodule 1:abc ### Learning outcomes: -lmn -pqr"
+        },
+        {
+            "id": "12",
+            "title": "GET_RECOMMENDED_JOB_TITLES_AND_LOCATIONS_PROMPT",
+            "description": "This prompt is used to recommend job titles and locations based on the profile provided.",
+            "prompt_content": "Based on the given Linkedin profile, recommend 3 job titles and locations that would be suitable for the person. \n\nProfile: {PROFILE}.  \nONLY RETURN THE LIST. If the provided information in the profile is not enough to make a recommendation, return 'Please update profile or resume to get a better recommendation.'",
+            "fields": [
+                {
+                    "name": "{PROFILE}",
+                    "type": "string",
+                    "label": "Profile",
+                    "description": "The profile of the person applying for the role"
+                }
+            ],
+            "OUTPUT_FORMAT": "[['job_title_1', 'location_1'], ['job_title_2', 'location_2'], ['job_title_3', 'location_3'], ['job_title_4', 'location_4'], ['job_title_5', 'location_5']]"
+        },
+        {
+            "id": "13",
+            "title": "CALCULATE_DELTA_PROMPT",
+            "description": "This prompt is used to calculate the delta between the skills required for the job and the skills possessed by the person.",
+            "prompt_content": "You are given a linkedin profile and a job description. Calculate the delta between the skills required for the job and the skills possessed by the person. \n\nProfile: {PROFILE}\n\nJob Description: {JOB_DESCRIPTION}\n. ONLY RETURN THE LIST.",
+            "fields": [
+                {
+                    "name": "{PROFILE}",
+                    "type": "string",
+                    "label": "Profile",
+                    "description": "The profile of the person applying for the role"
+                },
+                {
+                    "name": "{JOB_DESCRIPTION}",
+                    "type": "string",
+                    "label": "Job Description",
+                    "description": "The job description for the position"
+                }
+            ],
+            "OUTPUT_FORMAT": "['skill_1', 'skill_2', 'skill_3', 'skill_4', 'skill_5']"
+        }
+    ]
+}
