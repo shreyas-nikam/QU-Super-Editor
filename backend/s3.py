@@ -43,6 +43,7 @@ def get_files_by_folder_from_s3() -> dict[str, list[str]]:
 # get the content of a file from the s3 bucket
 def get_file_content_from_s3(key: str) -> str:
     bucket_name='qucoursify'
+    key="qu-super-editor/" + key
     s3 = boto3.client("s3", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
     response = s3.get_object(Bucket=bucket_name, Key=key)
     content = response["Body"].read().decode("utf-8")
